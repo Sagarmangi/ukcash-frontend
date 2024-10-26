@@ -76,14 +76,12 @@ export default function Header({ loggedIn, onOpen, isOpen }) {
         </Flex>
       </Flex>
 
-      {/* Include the SidebarModal */}
       <SidebarModal
         isOpen={isSidebarModalOpen}
         onClose={handleSidebarModalClose}
         member={data}
       />
 
-      {/* Include the NotificationModal */}
       <NotificationsModal
         isOpen={isNotificationModalOpen}
         onClose={handleNotificationModalClose}

@@ -80,6 +80,7 @@ export default function MembersPage() {
   };
 
   const handleSave = (updatedMember) => {
+    window.location.reload();
     setMembers(
       members.map((member) =>
         member.username === updatedMember.username ? updatedMember : member

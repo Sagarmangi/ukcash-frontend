@@ -79,7 +79,15 @@ export default function Sidebar({ user }) {
                 showIcon
                 label="Withdraw"
               />
-              {data?.role === "admin" || "agent" ? (
+              {data?.role === "admin" ? (
+                <NavButton
+                  color="white"
+                  to="/submissions"
+                  icon="folder-4-line"
+                  showIcon
+                  label="Submissions"
+                />
+              ) : data?.role === "agent" ? (
                 <NavButton
                   color="white"
                   to="/submissions"
@@ -97,13 +105,39 @@ export default function Sidebar({ user }) {
                   label="Account Details"
                 />
               ) : null}
-              {data?.role === "admin" || "agent" ? (
+              {data?.role === "admin" ? (
                 <NavButton
                   color="white"
                   to="/members"
                   icon="group-line"
                   showIcon
                   label="Members"
+                />
+              ) : data?.role === "agent" ? (
+                <NavButton
+                  color="white"
+                  to="/members"
+                  icon="group-line"
+                  showIcon
+                  label="Members"
+                />
+              ) : null}
+              {data?.role !== "admin" && "agent" ? (
+                <NavButton
+                  color="white"
+                  to="/deposit-history"
+                  icon="inbox-archive-line"
+                  showIcon
+                  label="Deposit History"
+                />
+              ) : null}
+              {data?.role !== "admin" && "agent" ? (
+                <NavButton
+                  color="white"
+                  to="/withdraw-history"
+                  icon="inbox-unarchive-line"
+                  showIcon
+                  label="Withdraw History"
                 />
               ) : null}
             </Flex>

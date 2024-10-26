@@ -101,17 +101,17 @@ export default function Register() {
           if (email) generateError(email);
           else if (password) generateError(password);
         } else {
-          const token = data.jwt;
-          setCookie("auth_token", token, { path: "/", maxAge: 172800 });
+          // const token = data.jwt;
+          // setCookie("auth_token", token, { path: "/", maxAge: 172800 });
           toast({
-            title: "Welcome",
+            title: "Thank You for Registering",
             description: `${data.firstName}!`,
             position: "top-right",
             status: "success",
             duration: 3000,
             isClosable: true,
           });
-          navigate("/dashboard");
+          navigate("/thank-you");
         }
       }
     } catch (ex) {

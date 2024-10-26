@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -19,9 +19,36 @@ import {
   //   useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useCookies } from "react-cookie";
+import { fetchUserData } from "../redux/UserSlice";
+import axios from "axios";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies([]);
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    if (cookies.jwt) {
+      const fetchTransactions = async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/transactions`,
+            { withCredentials: true }
+          );
+          setData(response.data);
+        } catch (err) {
+          console.error("Error fetching notifications:", err);
+        }
+      };
+
+      fetchTransactions();
+    } else {
+      navigate("/login");
+    }
+  }, [cookies.jwt, navigate]);
+
   return (
     <>
       <Flex
@@ -89,7 +116,7 @@ export default function Dashboard() {
                 View All
               </Button>
             </Flex>
-            <Text fontSize="2xl">Rs. 9900</Text>
+            <Text fontSize="2xl">Rs. {data?.totalDeposit} </Text>
           </Flex>
           <Flex
             gap="1rem"
@@ -115,7 +142,7 @@ export default function Dashboard() {
                 View All
               </Button>
             </Flex>
-            <Text fontSize="2xl">Rs. 8800</Text>
+            <Text fontSize="2xl">Rs. {data?.totalWithdraw}</Text>
           </Flex>
         </Flex>
       </Flex>

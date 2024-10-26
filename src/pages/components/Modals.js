@@ -24,6 +24,7 @@ import { NavButton } from "../../@uikit/NavButton";
 import { Icon } from "../../@uikit/Icon";
 import { useCookies } from "react-cookie";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function SubmissionDetailsModal({
   isOpen,
@@ -135,6 +136,9 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
     role: "",
     accountStatus: "",
   });
+
+  const { data } = useSelector((state) => state.user);
+
   const toast = useToast();
   useEffect(() => {
     if (member) {
@@ -222,7 +226,7 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
                 onChange={handleChange}
               />
             </FormControl>
-            {formData.role === "admin" ? (
+            {data?.role === "admin" ? (
               <>
                 <FormControl>
                   <FormLabel>Role</FormLabel>
@@ -294,6 +298,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/dashboard"
+              onClick={onClose}
               icon="home-2-line"
               showIcon
               label="Dashboard"
@@ -301,6 +306,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/deposit"
+              onClick={onClose}
               icon="inbox-archive-line"
               showIcon
               label="Deposit"
@@ -308,6 +314,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/withdraw"
+              onClick={onClose}
               icon="cash-line"
               showIcon
               label="Withdraw"
@@ -315,6 +322,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/submissions"
+              onClick={onClose}
               icon="folder-4-line"
               showIcon
               label="Submissions"
@@ -322,6 +330,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/account-details"
+              onClick={onClose}
               icon="money-dollar-circle-line"
               showIcon
               label="Account Details"
@@ -329,6 +338,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
             <NavButton
               color="white"
               to="/members"
+              onClick={onClose}
               icon="group-line"
               showIcon
               label="Members"

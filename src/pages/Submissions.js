@@ -32,6 +32,7 @@ export default function Submissions() {
           { withCredentials: true }
         );
         setSubmissions(data);
+        console.log(data);
       } catch (error) {
         console.error("Error fetching submissions:", error);
       }
@@ -185,18 +186,18 @@ function SubmissionsTable({
       <Tbody>
         {submissions.map((submission) => (
           <Tr key={submission._id}>
-            <Td>{submission.user.username}</Td>
+            <Td>{submission?.user?.username}</Td>
             <Td>
-              {submission.user.firstName} {submission.user.lastName}
+              {submission?.user?.firstName} {submission?.user?.lastName}
             </Td>
-            <Td>${submission.amount}</Td>
-            <Td>{submission.type}</Td>
+            <Td>${submission?.amount}</Td>
+            <Td>{submission?.type}</Td>
             <Td>
               <Select
                 color="black"
                 bgColor="white"
                 fontSize="12px"
-                value={submission.status}
+                value={submission?.status}
                 onChange={(e) => onStatusChange(submission._id, e.target.value)}
               >
                 <option value="approved">Approved</option>
