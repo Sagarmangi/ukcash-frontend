@@ -17,7 +17,6 @@ import {
 import { Icon } from "../@uikit/Icon";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import LoginBg from "../LoginBg.jpg";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import WelcomeHeader from "./components/WelcomeHeader";
@@ -26,7 +25,7 @@ export default function Register() {
   const navigate = useNavigate();
   const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
+  const [cookies, removeCookie] = useCookies(["auth_token"]);
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
@@ -111,7 +110,7 @@ export default function Register() {
             duration: 3000,
             isClosable: true,
           });
-          navigate("/thank-you");
+          navigate("/dashboard");
         }
       }
     } catch (ex) {

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Routes as Switch, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./Components/Sidebar";
-import { Box, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, useDisclosure } from "@chakra-ui/react";
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserData } from "../redux/UserSlice";
@@ -15,11 +15,9 @@ import MembersPage from "../pages/MembersPage";
 import DepositHistory from "../pages/DepositHistory ";
 import WithdrawHistory from "../pages/WithdrawHistory";
 import Profile from "../pages/Profile";
-import ThankYou from "../pages/ThankYou";
 
 function DashboardLayout() {
   const { data } = useSelector((state) => state.user);
-  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -37,18 +35,6 @@ function DashboardLayout() {
   useEffect(() => {
     if (data && data.status === false) {
       console.log(data);
-      setCookie("jwt", "", { path: "/", maxAge: 0 });
-      navigate("/login");
-    }
-    if (data && data.accountStatus === "unapproved") {
-      toast({
-        title: "Login Failed",
-        description: `${data.firstName}! Your account has not been approved yet.`,
-        position: "top-right",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
       setCookie("jwt", "", { path: "/", maxAge: 0 });
       navigate("/login");
     }

@@ -461,6 +461,7 @@ export function NotificationsModal({ isOpen, onClose }) {
                           ? "/submissions"
                           : "/members"
                       }
+                      onClick={onClose}
                     />
                     <Button
                       size="sm"

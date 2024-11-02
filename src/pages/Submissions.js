@@ -16,7 +16,6 @@ import {
   Select,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import SubmissionDetailsModal from "./components/Modals"; // Import the new modal component
 
 export default function Submissions() {
