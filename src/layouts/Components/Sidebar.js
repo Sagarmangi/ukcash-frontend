@@ -171,7 +171,7 @@ export default function Sidebar({ user }) {
                         {data?.firstName} {data?.lastName}
                       </Text>
                       <Text fontSize="sm" color="white">
-                        {data?.email}
+                        {data?.phoneNumber}
                       </Text>
                     </Box>
                   </Flex>
@@ -188,14 +188,6 @@ export default function Sidebar({ user }) {
                       {data?.firstName} {data?.lastName}
                     </Heading>
                   </Box>
-                  <MenuItem
-                    fontSize="14px"
-                    as={NavLink}
-                    to="/profile"
-                    icon={<Icon name="user-edit-solid" />}
-                  >
-                    My Profile
-                  </MenuItem>
                   <MenuItem
                     fontSize="14px"
                     onClick={handleLogout}

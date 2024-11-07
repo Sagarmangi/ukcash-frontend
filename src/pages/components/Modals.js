@@ -106,7 +106,8 @@ export function ViewMemberModal({ isOpen, onClose, member }) {
               <b>Name:</b> {member.firstName} {member.lastName}
             </Text>
             <Text>
-              <b>Email:</b> {member.email}
+              <b>Phone Number:</b> {member.phoneNumber}{" "}
+              {/* Updated label and field */}
             </Text>
             <Text>
               <b>Role:</b> {member.role}
@@ -132,21 +133,21 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
     userName: "",
     firstName: "",
     lastName: "",
-    email: "",
+    phoneNumber: "", // Changed from email to phoneNumber
     role: "",
     accountStatus: "",
   });
 
   const { data } = useSelector((state) => state.user);
-
   const toast = useToast();
+
   useEffect(() => {
     if (member) {
       setFormData((prev) => ({
         userName: member.username,
         firstName: member.firstName,
         lastName: member.lastName,
-        email: member.email,
+        phoneNumber: member.phoneNumber, // Updated to set phone number
         role: member.role,
         accountStatus: member.accountStatus,
       }));
@@ -217,12 +218,11 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Phone Number</FormLabel> {/* Updated label */}
               <Input
-                name="email"
-                type="email"
-                isDisabled
-                value={formData.email}
+                name="phoneNumber" // Updated field name
+                type="tel"
+                value={formData.phoneNumber} // Updated value
                 onChange={handleChange}
               />
             </FormControl>
@@ -238,7 +238,6 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
-                    {/* Add more roles if needed */}
                   </Select>
                 </FormControl>
                 <FormControl>
@@ -250,7 +249,6 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
                   >
                     <option value="approved">Approved</option>
                     <option value="unapproved">Unapproved</option>
-                    {/* Add more statuses if needed */}
                   </Select>
                 </FormControl>
               </>

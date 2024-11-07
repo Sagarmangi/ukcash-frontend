@@ -151,7 +151,7 @@ function MembersTable({ members, onEdit, onDelete, onView }) {
         <Tr>
           <Th color="white">Username</Th>
           <Th color="white">Name</Th>
-          <Th color="white">Email</Th>
+          <Th color="white">Phone Number</Th>
           <Th color="white">Role</Th>
           <Th color="white">Status</Th>
           <Th color="white">Actions</Th>
@@ -164,7 +164,7 @@ function MembersTable({ members, onEdit, onDelete, onView }) {
             <Td>
               {member.firstName} {member.lastName}
             </Td>
-            <Td>{member.email}</Td>
+            <Td>{member.phoneNumber}</Td>
             <Td>{member.role}</Td>
             <Td>{member.accountStatus}</Td>
             <Td>

@@ -25,44 +25,42 @@ export default function Register() {
   const navigate = useNavigate();
   const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [cookies, removeCookie] = useCookies(["auth_token"]);
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    phoneNumber: "",
     password: "",
   });
 
   useEffect(() => {
-    const authToken = cookies.auth_token;
-
     const verifyUser = async () => {
-      if (!authToken) {
-        navigate("/register");
-      } else {
-        try {
-          const { data } = await axios.post(
-            `${process.env.REACT_APP_API_URL}/`,
-            { auth_token: authToken },
-            { withCredentials: true }
-          );
-          if (!data.status) {
-            removeCookie("auth_token");
-            navigate("/register");
-          } else {
-            navigate("/");
-          }
-        } catch (err) {
-          console.log(err);
+      if (!cookies.auth_token) {
+        return navigate("/register");
+      }
+
+      try {
+        const { data } = await axios.post(
+          `${process.env.REACT_APP_API_URL}/`,
+          { auth_token: cookies.auth_token },
+          { withCredentials: true }
+        );
+        if (!data.status) {
+          removeCookie("auth_token");
+          navigate("/register");
+        } else {
+          navigate("/");
         }
+      } catch (err) {
+        console.error("Token verification failed", err);
       }
     };
+
     verifyUser();
   }, [cookies, navigate, removeCookie]);
 
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleShowPassword = () => setShowPassword(!showPassword);
 
   const generateError = (error) => {
     toast({
@@ -75,8 +73,15 @@ export default function Register() {
     });
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({ ...prevValues, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     toast({
       title: "Signing Up",
       position: "top-right",
@@ -84,37 +89,34 @@ export default function Register() {
       duration: 3000,
       isClosable: true,
     });
+
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/register`,
-        {
-          ...values,
-        },
-        {
-          withCredentials: true,
-        }
+        values,
+        { withCredentials: true }
       );
-      if (data) {
-        if (data.errors) {
-          const { email, password } = data.errors;
-          if (email) generateError(email);
-          else if (password) generateError(password);
-        } else {
-          // const token = data.jwt;
-          // setCookie("auth_token", token, { path: "/", maxAge: 172800 });
-          toast({
-            title: "Thank You for Registering",
-            description: `${data.firstName}!`,
-            position: "top-right",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-          navigate("/dashboard");
-        }
+
+      if (data.errors) {
+        const { phoneNumber, password } = data.errors;
+        if (phoneNumber) generateError(phoneNumber);
+        if (password) generateError(password);
+      } else {
+        toast({
+          title: "Thank You for Registering",
+          description: `Welcome, ${data.firstName}!`,
+          position: "top-right",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        navigate("/dashboard");
       }
-    } catch (ex) {
-      console.log(ex);
+    } catch (err) {
+      console.error("Registration failed", err);
+      generateError("Registration failed, please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,119 +148,69 @@ export default function Register() {
           px="2rem"
           py="1.5rem"
         >
-          <Box
-            flex={3}
-            px={6}
-            py={5}
-            flexDir="column"
-            display="flex"
-            justifyContent="flex-start"
-            w="100%"
-          >
-            <Text fontSize="xl">Welcome to</Text>
-            <Text fontFamily="cursive" fontSize="3xl" my="1rem">
-              <Icon name="file-text-line" fontSize="3xl" /> UK Cash 24
-            </Text>
-            <Text>Login To your account to earn money easily.</Text>
-          </Box>
+          <Text fontSize="xl">Welcome to</Text>
+          <Text fontFamily="cursive" fontSize="3xl" my="1rem">
+            <Icon name="file-text-line" fontSize="3xl" /> UK Cash 24
+          </Text>
+          <Text>Login to your account to earn money easily.</Text>
         </Box>
         <Box
           maxW={{ base: "20rem", md: "24rem", lg: "26rem" }}
           minH="32.5rem"
-          maxH="32.5rem"
           display="flex"
           flexDir="column"
           py="2rem"
-          flex={1}
           bgImage="https://www.transparenttextures.com/patterns/checkered-pattern.png"
           bgColor={process.env.REACT_APP_PRIMARY_COLOR}
           color="white"
           borderRadius="0px 10px 10px 0"
           px="2rem"
         >
-          <Box
-            flex={3}
-            px={6}
-            py={5}
-            my="auto"
-            flexDir="column"
-            display="flex"
-            justifyContent="flex-start"
-            w="100%"
-          >
-            <Heading size="lg" mb="1.5rem">
-              Create a new account
-            </Heading>
-            <form onSubmit={handleSubmit} id="login-form">
-              <Stack direction="column">
-                <Grid
-                  templateColumns="repeat(2, 1fr)"
-                  gap={8}
-                  justify="space-evenly"
-                >
-                  <FormControl>
-                    <FormLabel textTransform="uppercase" fontSize="12px">
-                      First Name:
-                    </FormLabel>
-                    <InputGroup>
-                      <Input
-                        type="text"
-                        value={values.firstName}
-                        name="firstName"
-                        onChange={(e) =>
-                          setValues({
-                            ...values,
-                            [e.target.name]: e.target.value,
-                          })
-                        }
-                        placeholder="First Name"
-                      />
-                    </InputGroup>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel textTransform="uppercase" fontSize="12px">
-                      last Name:
-                    </FormLabel>
-                    <InputGroup>
-                      <Input
-                        type="text"
-                        value={values.lastName}
-                        name="lastName"
-                        onChange={(e) =>
-                          setValues({
-                            ...values,
-                            [e.target.name]: e.target.value,
-                          })
-                        }
-                        placeholder="Last Name"
-                      />
-                    </InputGroup>
-                  </FormControl>
-                </Grid>
-                <FormLabel textTransform="uppercase" fontSize="12px" mt="1rem">
-                  Email Address:
-                </FormLabel>
+          <Heading size="lg" mb="1.5rem">
+            Create a new account
+          </Heading>
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={4}>
+              <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                <FormControl>
+                  <FormLabel>First Name:</FormLabel>
+                  <Input
+                    type="text"
+                    name="firstName"
+                    value={values.firstName}
+                    onChange={handleInputChange}
+                    placeholder="First Name"
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Last Name:</FormLabel>
+                  <Input
+                    type="text"
+                    name="lastName"
+                    value={values.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Last Name"
+                  />
+                </FormControl>
+              </Grid>
+              <FormControl>
+                <FormLabel>Phone Number:</FormLabel>
                 <InputGroup>
                   <InputLeftElement
                     pointerEvents="none"
-                    children={
-                      <Icon color="#f5ba13" fontSize={18} name="mail-line" />
-                    }
+                    children={<Icon color="#f5ba13" name="phone-line" />}
                   />
                   <Input
-                    type="email"
-                    value={values.email}
-                    name="email"
-                    onChange={(e) =>
-                      setValues({ ...values, [e.target.name]: e.target.value })
-                    }
-                    placeholder="e.g. john@email.com"
+                    type="tel"
+                    name="phoneNumber"
+                    value={values.phoneNumber}
+                    onChange={handleInputChange}
+                    placeholder="e.g. +123456789"
                   />
                 </InputGroup>
-
-                <FormLabel textTransform="uppercase" fontSize="12px" mt="1rem">
-                  Password:
-                </FormLabel>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Password:</FormLabel>
                 <InputGroup>
                   <InputLeftElement
                     pointerEvents="none"
@@ -268,69 +220,38 @@ export default function Register() {
                   />
                   <Input
                     type={showPassword ? "text" : "password"}
-                    value={values.password}
                     name="password"
-                    onChange={(e) =>
-                      setValues({ ...values, [e.target.name]: e.target.value })
-                    }
+                    value={values.password}
+                    onChange={handleInputChange}
                     placeholder="Enter your password"
                   />
                   <InputRightElement width="3rem">
                     <IconButton
                       bg="transparent"
-                      size="sm"
-                      _hover={{ bg: "#ffffff" }}
+                      onClick={handleShowPassword}
                       icon={
-                        showPassword ? (
-                          <Icon
-                            name="eye-off-line"
-                            fontSize="xl"
-                            color="gray"
-                            onClick={handleShowPassword}
-                          />
-                        ) : (
-                          <Icon
-                            name="eye-line"
-                            onClick={handleShowPassword}
-                            fontSize="xl"
-                            color="grey"
-                          />
-                        )
+                        <Icon
+                          name={showPassword ? "eye-off-line" : "eye-line"}
+                        />
                       }
                     />
                   </InputRightElement>
                 </InputGroup>
-                <Stack
-                  direction="column"
-                  pt="5"
-                  justifyContent="space-between"
-                  // alignItems="center"
-                >
-                  <Text
-                    color="#126dfc"
-                    fontSize="sm"
-                    variant="link"
-                    as={Link}
-                    to="/login"
-                  >
-                    Already have an account?
-                  </Text>
-                  <Button
-                    size="lg"
-                    type="submit"
-                    form="login-form"
-                    bg={process.env.REACT_APP_BUTTON_COLOR}
-                    color="black"
-                    _hover={{
-                      background: "rgba(255,255,0,1)",
-                    }}
-                  >
-                    Register
-                  </Button>
-                </Stack>
-              </Stack>
-            </form>
-          </Box>
+              </FormControl>
+              <Button
+                isLoading={loading}
+                type="submit"
+                bg={process.env.REACT_APP_BUTTON_COLOR}
+                color="black"
+                _hover={{ bg: "yellow.400" }}
+              >
+                Register
+              </Button>
+              <Text color="#126dfc" fontSize="sm" as={Link} to="/login">
+                Already have an account?
+              </Text>
+            </Stack>
+          </form>
         </Box>
       </Box>
     </>

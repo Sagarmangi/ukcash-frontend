@@ -15,7 +15,6 @@ import {
 import { Icon } from "../@uikit/Icon";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import LoginBg from "../LoginBg.jpg";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import WelcomeHeader from "./components/WelcomeHeader";
@@ -26,10 +25,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
   const [values, setValues] = useState({
-    email: "",
+    phoneNumber: "",
     password: "",
   });
-  /////////////ADD TOAST OF WELCOME IN SUBMIT FUNCTION TO TOAST WELCOME BEFORE NAVIGATE ON LOGIN & REG
+
   useEffect(() => {
     const authToken = cookies.auth_token;
 
@@ -89,8 +88,8 @@ export default function Login() {
       );
       if (data) {
         if (data.errors) {
-          const { email, password } = data.errors;
-          if (email) generateError(email);
+          const { phoneNumber, password } = data.errors;
+          if (phoneNumber) generateError(phoneNumber);
           else if (password) generateError(password);
         } else {
           const token = data.jwt;
@@ -156,7 +155,7 @@ export default function Login() {
             <Text fontFamily="cursive" fontSize="3xl" my="1rem">
               <Icon name="file-text-line" fontSize="3xl" /> UK Cash 24
             </Text>
-            <Text>Login To your account to earn money easily.</Text>
+            <Text>Login to your account to earn money easily.</Text>
           </Box>
         </Box>
         <Box
@@ -192,7 +191,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} id="login-form">
               <Stack direction="column">
                 <FormLabel textTransform="uppercase" fontSize="12px">
-                  Email ID
+                  Phone Number
                 </FormLabel>
                 <InputGroup>
                   <InputLeftElement
@@ -201,18 +200,18 @@ export default function Login() {
                       <Icon
                         color={process.env.REACT_APP_PRIMARY_COLOR}
                         fontSize={18}
-                        name="mail-line"
+                        name="phone-line"
                       />
                     }
                   />
                   <Input
-                    type="email"
-                    value={values.email}
-                    name="email"
+                    type="tel"
+                    value={values.phoneNumber}
+                    name="phoneNumber"
                     onChange={(e) =>
                       setValues({ ...values, [e.target.name]: e.target.value })
                     }
-                    placeholder="e.g. john@email.com"
+                    placeholder="e.g. 123-456-7890"
                   />
                 </InputGroup>
 
