@@ -138,6 +138,7 @@ export default function MembersPage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         member={selectedMember}
+        allMembers={members}
         onSave={handleSave}
       />
     </Flex>
@@ -154,6 +155,7 @@ function MembersTable({ members, onEdit, onDelete, onView }) {
           <Th color="white">Phone Number</Th>
           <Th color="white">Role</Th>
           <Th color="white">Status</Th>
+          <Th color="white">Assigned Agent</Th> {/* New Column */}
           <Th color="white">Actions</Th>
         </Tr>
       </Thead>
@@ -167,6 +169,12 @@ function MembersTable({ members, onEdit, onDelete, onView }) {
             <Td>{member.phoneNumber}</Td>
             <Td>{member.role}</Td>
             <Td>{member.accountStatus}</Td>
+            <Td>
+              {/* Display assigned agent's name */}
+              {member.assignedAgent
+                ? `${member.assignedAgent.firstName} ${member.assignedAgent.lastName} (${member.assignedAgent.username})`
+                : "Not Assigned"}
+            </Td>
             <Td>
               <IconButton
                 icon={

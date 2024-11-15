@@ -106,8 +106,7 @@ export function ViewMemberModal({ isOpen, onClose, member }) {
               <b>Name:</b> {member.firstName} {member.lastName}
             </Text>
             <Text>
-              <b>Phone Number:</b> {member.phoneNumber}{" "}
-              {/* Updated label and field */}
+              <b>Phone Number:</b> {member.phoneNumber}
             </Text>
             <Text>
               <b>Role:</b> {member.role}
@@ -115,7 +114,14 @@ export function ViewMemberModal({ isOpen, onClose, member }) {
             <Text>
               <b>Status:</b> {member.accountStatus}
             </Text>
-            {/* Add more fields as needed */}
+
+            {/* Display Assigned Agent */}
+            <Text>
+              <b>Assigned Agent:</b>{" "}
+              {member.assignedAgent
+                ? `${member.assignedAgent.firstName} ${member.assignedAgent.lastName} (${member.assignedAgent.username})`
+                : "Not Assigned"}
+            </Text>
           </Flex>
         </ModalBody>
         <ModalFooter>
@@ -128,37 +134,51 @@ export function ViewMemberModal({ isOpen, onClose, member }) {
   );
 }
 
-export function EditMemberModal({ isOpen, onClose, member, onSave }) {
+export function EditMemberModal({
+  isOpen,
+  onClose,
+  member,
+  allMembers,
+  onSave,
+}) {
   const [formData, setFormData] = useState({
     userName: "",
     firstName: "",
     lastName: "",
-    phoneNumber: "", // Changed from email to phoneNumber
+    phoneNumber: "",
     role: "",
     accountStatus: "",
+    assignedAgent: "", // Added field for assigned agent
   });
 
   const { data } = useSelector((state) => state.user);
   const toast = useToast();
 
+  // Filter agents from allMembers
+  const agents = allMembers.filter((user) => user.role === "agent");
+
+  // Populate form data with existing member details
   useEffect(() => {
     if (member) {
-      setFormData((prev) => ({
+      setFormData({
         userName: member.username,
         firstName: member.firstName,
         lastName: member.lastName,
-        phoneNumber: member.phoneNumber, // Updated to set phone number
+        phoneNumber: member.phoneNumber,
         role: member.role,
         accountStatus: member.accountStatus,
-      }));
+        assignedAgent: member.assignedAgent?._id || "", // Set existing assigned agent if available
+      });
     }
   }, [member]);
 
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Submit updated user details
   const handleSubmit = async () => {
     try {
       await axios.put(
@@ -197,7 +217,7 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
               <Input
                 name="username"
                 isDisabled
-                value={formData?.userName}
+                value={formData.userName}
                 onChange={handleChange}
               />
             </FormControl>
@@ -205,7 +225,7 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
               <FormLabel>First Name</FormLabel>
               <Input
                 name="firstName"
-                value={formData?.firstName}
+                value={formData.firstName}
                 onChange={handleChange}
               />
             </FormControl>
@@ -218,14 +238,32 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Phone Number</FormLabel> {/* Updated label */}
+              <FormLabel>Phone Number</FormLabel>
               <Input
-                name="phoneNumber" // Updated field name
+                name="phoneNumber"
                 type="tel"
-                value={formData.phoneNumber} // Updated value
+                value={formData.phoneNumber}
                 onChange={handleChange}
               />
             </FormControl>
+
+            {/* Dropdown for assigning agent */}
+            <FormControl>
+              <FormLabel>Assign Agent</FormLabel>
+              <Select
+                name="assignedAgent"
+                value={formData.assignedAgent}
+                onChange={handleChange}
+                placeholder="Select an agent"
+              >
+                {agents.map((agent) => (
+                  <option key={agent._id} value={agent._id}>
+                    {agent.firstName} {agent.lastName} ({agent.username})
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
             {data?.role === "admin" ? (
               <>
                 <FormControl>
@@ -275,6 +313,7 @@ export function EditMemberModal({ isOpen, onClose, member, onSave }) {
 export function SidebarModal({ isOpen, onClose, member }) {
   const navigate = useNavigate();
   const [cookies, setCookie] = useCookies([]);
+  const { data } = useSelector((state) => state.user);
 
   const handleLogout = () => {
     setCookie("auth_token", "", { path: "/", maxAge: 0 });
@@ -317,30 +356,67 @@ export function SidebarModal({ isOpen, onClose, member }) {
               showIcon
               label="Withdraw"
             />
-            <NavButton
-              color="white"
-              to="/submissions"
-              onClick={onClose}
-              icon="folder-4-line"
-              showIcon
-              label="Submissions"
-            />
-            <NavButton
-              color="white"
-              to="/account-details"
-              onClick={onClose}
-              icon="money-dollar-circle-line"
-              showIcon
-              label="Account Details"
-            />
-            <NavButton
-              color="white"
-              to="/members"
-              onClick={onClose}
-              icon="group-line"
-              showIcon
-              label="Members"
-            />
+            {data?.role === "admin" ? (
+              <NavButton
+                color="white"
+                to="/submissions"
+                icon="folder-4-line"
+                showIcon
+                label="Submissions"
+              />
+            ) : data?.role === "agent" ? (
+              <NavButton
+                color="white"
+                to="/submissions"
+                icon="folder-4-line"
+                showIcon
+                label="Submissions"
+              />
+            ) : null}
+            {data?.role === "admin" ? (
+              <NavButton
+                color="white"
+                to="/account-details"
+                icon="money-dollar-circle-line"
+                showIcon
+                label="Account Details"
+              />
+            ) : null}
+            {data?.role === "admin" ? (
+              <NavButton
+                color="white"
+                to="/members"
+                icon="group-line"
+                showIcon
+                label="Members"
+              />
+            ) : data?.role === "agent" ? (
+              <NavButton
+                color="white"
+                to="/members"
+                icon="group-line"
+                showIcon
+                label="Members"
+              />
+            ) : null}
+            {data?.role !== "admin" && "agent" ? (
+              <NavButton
+                color="white"
+                to="/deposit-history"
+                icon="inbox-archive-line"
+                showIcon
+                label="Deposit History"
+              />
+            ) : null}
+            {data?.role !== "admin" && "agent" ? (
+              <NavButton
+                color="white"
+                to="/withdraw-history"
+                icon="inbox-unarchive-line"
+                showIcon
+                label="Withdraw History"
+              />
+            ) : null}
             <Button
               fontSize="14px"
               bg={process.env.REACT_APP_BUTTON_COLOR}
