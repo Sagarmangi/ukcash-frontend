@@ -117,7 +117,7 @@ export function ViewMemberModal({ isOpen, onClose, member }) {
 
             {/* Display Assigned Agent */}
             <Text>
-              <b>Assigned Agent:</b>{" "}
+              <b>Assigned To:</b>{" "}
               {member.assignedAgent
                 ? `${member.assignedAgent.firstName} ${member.assignedAgent.lastName} (${member.assignedAgent.username})`
                 : "Not Assigned"}
@@ -156,6 +156,7 @@ export function EditMemberModal({
 
   // Filter agents from allMembers
   const agents = allMembers.filter((user) => user.role === "agent");
+  const admins = allMembers.filter((user) => user.role === "admin");
 
   // Populate form data with existing member details
   useEffect(() => {
@@ -167,7 +168,7 @@ export function EditMemberModal({
         phoneNumber: member.phoneNumber,
         role: member.role,
         accountStatus: member.accountStatus,
-        assignedAgent: member.assignedAgent?._id || "", // Set existing assigned agent if available
+        assignedAgent: member.assignedAgent?._id || null, // Set existing assigned agent if available
       });
     }
   }, [member]);
@@ -247,24 +248,26 @@ export function EditMemberModal({
               />
             </FormControl>
 
-            {/* Dropdown for assigning agent */}
-            <FormControl>
-              <FormLabel>Assign Agent</FormLabel>
-              <Select
-                name="assignedAgent"
-                value={formData.assignedAgent}
-                onChange={handleChange}
-                placeholder="Select an agent"
-              >
-                {agents.map((agent) => (
-                  <option key={agent._id} value={agent._id}>
-                    {agent.firstName} {agent.lastName} ({agent.username})
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
+            {/* Conditionally render the 'Assign To' field based on user role */}
+            {formData.role !== "admin" && (
+              <FormControl>
+                <FormLabel>Assign To</FormLabel>
+                <Select
+                  name="assignedAgent"
+                  value={formData.assignedAgent}
+                  onChange={handleChange}
+                  placeholder="Select an agent"
+                >
+                  {(formData.role === "agent" ? admins : agents).map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.firstName} {user.lastName} ({user.username})
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
 
-            {data?.role === "admin" ? (
+            {data?.role === "super admin" ? (
               <>
                 <FormControl>
                   <FormLabel>Role</FormLabel>
@@ -273,8 +276,9 @@ export function EditMemberModal({
                     value={formData.role}
                     onChange={handleChange}
                   >
-                    <option value="agent">Agent</option>
+                    <option value="super admin">Super Admin</option>
                     <option value="admin">Admin</option>
+                    <option value="agent">Agent</option>
                     <option value="user">User</option>
                   </Select>
                 </FormControl>
@@ -319,6 +323,10 @@ export function SidebarModal({ isOpen, onClose, member }) {
     setCookie("auth_token", "", { path: "/", maxAge: 0 });
     navigate("/login");
   };
+
+  const isAdminOrSuperAdmin =
+    data?.role === "admin" || data?.role === "super admin";
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -356,7 +364,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
               showIcon
               label="Withdraw"
             />
-            {data?.role === "admin" ? (
+            {(isAdminOrSuperAdmin || data?.role === "agent") && (
               <NavButton
                 color="white"
                 to="/submissions"
@@ -364,16 +372,8 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 showIcon
                 label="Submissions"
               />
-            ) : data?.role === "agent" ? (
-              <NavButton
-                color="white"
-                to="/submissions"
-                icon="folder-4-line"
-                showIcon
-                label="Submissions"
-              />
-            ) : null}
-            {data?.role === "admin" ? (
+            )}
+            {data?.role === "super admin" && (
               <NavButton
                 color="white"
                 to="/account-details"
@@ -381,8 +381,8 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 showIcon
                 label="Account Details"
               />
-            ) : null}
-            {data?.role === "admin" ? (
+            )}
+            {isAdminOrSuperAdmin && (
               <NavButton
                 color="white"
                 to="/members"
@@ -390,16 +390,8 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 showIcon
                 label="Members"
               />
-            ) : data?.role === "agent" ? (
-              <NavButton
-                color="white"
-                to="/members"
-                icon="group-line"
-                showIcon
-                label="Members"
-              />
-            ) : null}
-            {data?.role !== "admin" && "agent" ? (
+            )}
+            {(data?.role === "agent" || data?.role === "user") && (
               <NavButton
                 color="white"
                 to="/deposit-history"
@@ -407,8 +399,8 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 showIcon
                 label="Deposit History"
               />
-            ) : null}
-            {data?.role !== "admin" && "agent" ? (
+            )}
+            {(data?.role === "agent" || data?.role === "user") && (
               <NavButton
                 color="white"
                 to="/withdraw-history"
@@ -416,7 +408,7 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 showIcon
                 label="Withdraw History"
               />
-            ) : null}
+            )}
             <Button
               fontSize="14px"
               bg={process.env.REACT_APP_BUTTON_COLOR}
@@ -439,10 +431,12 @@ export function NotificationsModal({ isOpen, onClose }) {
   const [error, setError] = useState("");
   const toast = useToast();
 
+  // Fetch notifications when modal opens
   useEffect(() => {
     if (isOpen) {
       const fetchNotifications = async () => {
         try {
+          setLoading(true);
           const response = await axios.get(
             `${process.env.REACT_APP_API_URL}/notifications`,
             { withCredentials: true }
@@ -468,6 +462,7 @@ export function NotificationsModal({ isOpen, onClose }) {
     }
   }, [isOpen, toast]);
 
+  // Handle notification deletion
   const handleDeleteNotification = async (id) => {
     try {
       await axios.delete(
@@ -475,7 +470,7 @@ export function NotificationsModal({ isOpen, onClose }) {
         { withCredentials: true }
       );
       setNotifications((prevNotifications) =>
-        prevNotifications.filter((notification) => notification.id !== id)
+        prevNotifications.filter((notification) => notification._id !== id)
       );
       toast({
         title: "Notification deleted.",
@@ -483,7 +478,6 @@ export function NotificationsModal({ isOpen, onClose }) {
         duration: 3000,
         isClosable: true,
       });
-      onClose();
     } catch (err) {
       console.error("Error deleting notification:", err);
       toast({
@@ -509,7 +503,7 @@ export function NotificationsModal({ isOpen, onClose }) {
             <Flex direction="column" gap="1rem">
               {notifications.map((notification) => (
                 <Box
-                  key={notification.id}
+                  key={notification._id}
                   p={4}
                   bg="gray.100"
                   borderRadius="md"

@@ -79,7 +79,15 @@ export default function Sidebar({ user }) {
                 showIcon
                 label="Withdraw"
               />
-              {data?.role === "admin" ? (
+              {data?.role === "super admin" ? (
+                <NavButton
+                  color="white"
+                  to="/submissions"
+                  icon="folder-4-line"
+                  showIcon
+                  label="Submissions"
+                />
+              ) : data?.role === "admin" ? (
                 <NavButton
                   color="white"
                   to="/submissions"
@@ -96,7 +104,7 @@ export default function Sidebar({ user }) {
                   label="Submissions"
                 />
               ) : null}
-              {data?.role === "admin" ? (
+              {data?.role === "super admin" ? (
                 <NavButton
                   color="white"
                   to="/account-details"
@@ -105,7 +113,15 @@ export default function Sidebar({ user }) {
                   label="Account Details"
                 />
               ) : null}
-              {data?.role === "admin" ? (
+              {data?.role === "super admin" ? (
+                <NavButton
+                  color="white"
+                  to="/members"
+                  icon="group-line"
+                  showIcon
+                  label="Members"
+                />
+              ) : data?.role === "admin" ? (
                 <NavButton
                   color="white"
                   to="/members"
@@ -122,7 +138,7 @@ export default function Sidebar({ user }) {
                   label="Members"
                 />
               ) : null}
-              {data?.role !== "admin" && "agent" ? (
+              {data?.role === "user" ? (
                 <NavButton
                   color="white"
                   to="/deposit-history"
@@ -131,7 +147,7 @@ export default function Sidebar({ user }) {
                   label="Deposit History"
                 />
               ) : null}
-              {data?.role !== "admin" && "agent" ? (
+              {data?.role === "user" ? (
                 <NavButton
                   color="white"
                   to="/withdraw-history"

@@ -131,7 +131,7 @@ export default function Dashboard() {
                   Login
                 </Button>
               </Link>
-              {userData?.role === "admin" && (
+              {userData?.role === "super admin" && (
                 <IconButton
                   icon={<Icon color="#f5ba13" fontSize={18} name="edit-line" />}
                   onClick={() => setIsEditing(true)}

@@ -155,7 +155,7 @@ function MembersTable({ members, onEdit, onDelete, onView }) {
           <Th color="white">Phone Number</Th>
           <Th color="white">Role</Th>
           <Th color="white">Status</Th>
-          <Th color="white">Assigned Agent</Th> {/* New Column */}
+          <Th color="white">Assigned to</Th>
           <Th color="white">Actions</Th>
         </Tr>
       </Thead>
