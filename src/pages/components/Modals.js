@@ -391,6 +391,15 @@ export function SidebarModal({ isOpen, onClose, member }) {
                 label="Members"
               />
             )}
+            {data?.role === "agent" ? (
+              <NavButton
+                color="white"
+                to="/members"
+                icon="group-line"
+                showIcon
+                label="Members"
+              />
+            ) : null}
             {(data?.role === "agent" || data?.role === "user") && (
               <NavButton
                 color="white"
