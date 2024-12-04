@@ -52,6 +52,18 @@ export default function SubmissionDetailsModal({
               <strong>Amount:</strong> ${submission.amount}
             </Text>
             <Text>
+              <strong>Payment Gateway:</strong> {submission.paymentGateway}
+            </Text>
+            <Text>
+              <strong>Bank Name:</strong> {submission.bankName}
+            </Text>
+            <Text>
+              <strong>Account Name:</strong> {submission.accountName}
+            </Text>
+            <Text>
+              <strong>Account Number:</strong> {submission.accountNumber}
+            </Text>
+            <Text>
               <strong>Type:</strong> {submission.type}
             </Text>
             <Text>
